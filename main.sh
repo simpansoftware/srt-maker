@@ -1,16 +1,16 @@
 #!/bin/bash
+# I really like this script. Give feedback at simon@simpansoftware.cc if you are reading this.
 
 function menu() {
     echo "1. Make a new file"
     echo "2. Edit SRT"
-    echo "3. Exit"
+    echo "3. View SRT"
+    echo "4. Exit"
     echo
-    echo "Select option:"
-    read option
+    read -p "Select option: " option
 
     if [ "$option" -eq 1 ]; then
-        echo "What do you want the file to be called?"
-        read file
+        read -p "What do you want the file to be called? " file
         if [[ "$file" != *.srt ]]; then
             file="$file.srt"
         fi
@@ -20,8 +20,19 @@ function menu() {
         sleep 2
         srt_maker
     elif [ "$option" -eq 3 ]; then
+        read -p "What file do you want to view? " file
+        if [[ "$file" != *.srt ]]; then
+            file="$file.srt"
+        fi
+        if [ ! -f "$file" ]; then
+            echo "The file name you entered does not seem to exist. Exiting..."
+        else
+            clear
+            cat "$file"
+            exit 0
+        fi
+    elif [ "$option" -eq 4 ]; then
         exit 0    
-    
     else
         echo "that isnt a option fool"
     fi
@@ -31,8 +42,10 @@ function menu() {
 
 function srt_maker() {
     count=1
-    echo "What file do you want to edit?"
-    read filename
+    read -p "What file do you want to edit? " filename
+    if [[ "$filename" != *.srt ]]; then
+        filename="$filename.srt"
+    fi
     if [ ! -f "$filename" ]; then
         echo "The file name you entered does not seem to exist. Exiting..."
     else
@@ -41,21 +54,18 @@ function srt_maker() {
             count=$(grep -E '^[0-9]+$' "$filename" | tail -n 1)
             count=$((count + 1))
             echo "Existing file found. Continuing on line $count."
-            echo "" >> "$filename"
         else
             count=1
         fi
         while true; do
-            echo "Enter start time. (HH:MM:SS,mmm)"
-            read start
-
-            echo "Enter end time. (HH:MM:SS,mmm)"
-            read end
-            
+            echo
+            read -p "Enter start time. (HH:MM:SS,mmm): " start
+            echo
+            read -p "Enter end time. (HH:MM:SS,mmm): " end
+            echo
             sleep 0.2
-
-            echo "Enter subtitle text:"
-            read text
+            read -p "Enter subtitle text: " text
+            echo
 
             if [ -z "$text" ]; then
                 echo "Exiting editor."
@@ -68,6 +78,7 @@ function srt_maker() {
             echo "" >> "$filename"
 
             ((count++))
+            echo "Moving on onto the next line."
         done
     fi
 }
